@@ -38,9 +38,8 @@ module Danger
       clubhouse_story_ids = []
 
       # Check for the branch
-      if (story_id = find_story_id(github.branch_for_head))
-        clubhouse_story_ids << story_id
-      end
+      story_id = find_story_id_in_branch
+      clubhouse_story_ids << story_id if story_id
 
       # Check all the commit messages
       messages.each do |message|
@@ -64,6 +63,10 @@ module Danger
     end
 
     private
+
+    def find_story_id_in_branch
+      find_story_id(github.branch_for_head) if defined? @dangerfile.github
+    end
 
     def post!(story_ids)
       message = "### Clubhouse Stories\n\n"

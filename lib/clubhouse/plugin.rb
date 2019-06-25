@@ -42,11 +42,7 @@ module Danger
       clubhouse_story_ids << story_id if story_id
 
       # Check all the commit messages
-      messages.each do |message|
-        if (story_id = find_story_id(message))
-          clubhouse_story_ids << story_id
-        end
-      end
+      clubhouse_story_ids += find_story_id_in_commits
 
       post!(clubhouse_story_ids) unless clubhouse_story_ids.empty?
     end
@@ -66,6 +62,10 @@ module Danger
 
     def find_story_id_in_branch
       find_story_id(github.branch_for_head) if defined? @dangerfile.github
+    end
+
+    def find_story_id_in_commits
+      messages.map { |message| find_story_id(message) }.compact
     end
 
     def post!(story_ids)

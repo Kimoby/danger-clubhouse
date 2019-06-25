@@ -14,9 +14,10 @@ This danger plugin does exactly that :)
 
 ## How?
 
-The plugin will parse branch name and commit messages and find the pattern
-of `chXXXX` where `XXXX` is the story id to Clubhouse. Then, it will
-link to all the stories as a separated message in the format of
+The plugin will parse branch name, commit messages, Pull Request 
+description, Pull Request comments and find the pattern of `chXXXX` where `XXXX`
+is the story id to Clubhouse. Then, it will link to all the stories 
+as a separated message in the format of
 `https://app.clubhouse.io/#{organization}/story/#{id}` for each story.
 
 ## Example
@@ -39,7 +40,8 @@ Set the orgazination name for Clubhouse.
 
 ### clubhouse.link_stories!
 
-Find stories in the format of chXXX from commits and branch name and
+Find stories in the format of `chXXX` from branch name, commit messages, Pull Request 
+description, Pull Request comments. Then, it will link to all the stories.
 
 ## Thanks
 

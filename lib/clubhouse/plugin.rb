@@ -31,7 +31,7 @@ module Danger
     # @return   [String]
     attr_accessor :organization
 
-    # Check the branch and commit messages to find clubhouse stories to link to.
+    # Check the branch, commit messages, comments and description to find clubhouse stories to link to.
     #
     # @return [void]
     def link_stories!
@@ -46,7 +46,7 @@ module Danger
 
     # Find clubhouse story ids in the body
     #
-    # @return Array<String>
+    # @return [Array<String>]
     def find_story_ids(body)
       body.scan(/ch(\d+)/).flatten
     end

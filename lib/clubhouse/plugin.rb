@@ -35,37 +35,40 @@ module Danger
     #
     # @return [void]
     def link_stories!
-      clubhouse_story_ids = []
-
-      # Check for the branch
-      story_id = find_story_id_in_branch
-      clubhouse_story_ids << story_id if story_id
-
-      # Check all the commit messages
-      clubhouse_story_ids += find_story_id_in_commits
-
-      post!(clubhouse_story_ids) unless clubhouse_story_ids.empty?
+      story_ids = []
+      story_ids += find_story_ids_in_branch
+      story_ids += find_story_ids_in_commits
+      story_ids += find_story_ids_in_description
+    
+      post!(story_ids) unless story_ids.empty?
     end
 
+    # Find clubhouse story ids in the body
+    #
+    # @return Array<String>
+    def find_story_ids(body)
+      body.scan(/ch(\d+)/).flatten
+    end
+    
     # Find clubhouse story id in the body
     #
     # @return [String, nil]
     def find_story_id(body)
-      if (match = body.match(/ch(\d+)/))
-        return match[1]
-      end
-
-      nil
+      find_story_ids(body).first
     end
 
     private
 
-    def find_story_id_in_branch
-      find_story_id(github.branch_for_head) if defined? @dangerfile.github
+    def find_story_ids_in_branch
+      find_story_ids(github.branch_for_head) if defined? @dangerfile.github
     end
 
-    def find_story_id_in_commits
-      messages.map { |message| find_story_id(message) }.compact
+    def find_story_ids_in_commits
+      messages.map { |message| find_story_ids(message) }.flatten
+    end
+    
+    def find_story_ids_in_description
+      find_story_ids(github.pr_body) if defined? @dangerfile.github
     end
 
     def post!(story_ids)

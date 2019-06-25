@@ -39,6 +39,7 @@ module Danger
       story_ids += find_story_ids_in_branch
       story_ids += find_story_ids_in_commits
       story_ids += find_story_ids_in_description
+      story_ids += find_story_ids_in_comments
     
       post!(story_ids) unless story_ids.empty?
     end
@@ -69,6 +70,16 @@ module Danger
     
     def find_story_ids_in_description
       find_story_ids(github.pr_body) if defined? @dangerfile.github
+    end
+
+    def find_story_ids_in_comments
+      if defined? @dangerfile.github
+        github
+          .api
+          .issue_comments(github.pr_json.head.repo.id, github.pr_json.number)
+          .map { |comment| find_story_ids(comment.body) }
+          .flatten
+      end
     end
 
     def post!(story_ids)

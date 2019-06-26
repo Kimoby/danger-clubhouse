@@ -44,14 +44,7 @@ module Danger
       end      
       markdown message
     end
-
-    # Find clubhouse all story ids.
-    #
-    # @return [Array<String>]
-    def find_all_story_ids
-      find_story_ids_in_branch + find_story_ids_in_commits + find_story_ids_in_description + find_story_ids_in_comments
-    end
-
+    
     # Find clubhouse story ids in the text.
     #
     # @return [Array<String>]
@@ -88,6 +81,10 @@ module Danger
           .map { |comment| find_story_ids(comment.body) }
           .flatten
       end
+    end
+    
+    def find_all_story_ids
+      find_story_ids_in_branch + find_story_ids_in_commits + find_story_ids_in_description + find_story_ids_in_comments
     end
       
     def story_link(id)

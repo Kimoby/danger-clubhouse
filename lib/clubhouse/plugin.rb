@@ -34,28 +34,36 @@ module Danger
     # Check the branch, commit messages, comments and description to find clubhouse stories to link to.
     #
     # @return [void]
-    def link_stories!
-      story_ids = []
-      story_ids += find_story_ids_in_branch
-      story_ids += find_story_ids_in_commits
-      story_ids += find_story_ids_in_description
-      story_ids += find_story_ids_in_comments
-    
-      post!(story_ids) unless story_ids.empty?
+    def link_stories!      
+      story_ids = find_all_story_ids
+      return if story_ids.empty?
+
+      message = "### Clubhouse Stories\n\n"
+      story_ids.each do |id|
+        message << "* [#{story_link(id)}](#{story_link(id)}) \n"
+      end      
+      markdown message
     end
 
-    # Find clubhouse story ids in the body
+    # Find clubhouse all story ids.
     #
     # @return [Array<String>]
-    def find_story_ids(body)
-      body.scan(/ch(\d+)/).flatten
+    def find_all_story_ids
+      find_story_ids_in_branch + find_story_ids_in_commits + find_story_ids_in_description + find_story_ids_in_comments
+    end
+
+    # Find clubhouse story ids in the text.
+    #
+    # @return [Array<String>]
+    def find_story_ids(text)
+      text.scan(/ch(\d+)/).flatten
     end
     
-    # Find clubhouse story id in the body
+    # Find clubhouse story id in the text.
     #
     # @return [String, nil]
-    def find_story_id(body)
-      find_story_ids(body).first
+    def find_story_id(text)
+      find_story_ids(text).first
     end
 
     private
@@ -65,7 +73,7 @@ module Danger
     end
 
     def find_story_ids_in_commits
-      messages.map { |message| find_story_ids(message) }.flatten
+      git.commits.map { |commit| find_story_ids(commit.message) }.flatten
     end
     
     def find_story_ids_in_description
@@ -81,17 +89,9 @@ module Danger
           .flatten
       end
     end
-
-    def post!(story_ids)
-      message = "### Clubhouse Stories\n\n"
-      story_ids.each do |id|
-        message << "* [https://app.clubhouse.io/#{organization}/story/#{id}](https://app.clubhouse.io/#{organization}/story/#{id}) \n"
-      end
-      markdown message
-    end
-
-    def messages
-      git.commits.map(&:message)
+      
+    def story_link(id)
+      "https://app.clubhouse.io/#{organization}/story/#{id}"
     end
   end
 end
